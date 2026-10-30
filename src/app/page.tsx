@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { MobileFrame } from '@/components/MobileFrame';
 import { MenuHeader } from '@/components/MenuHeader';
 import { CategoryNav } from '@/components/CategoryNav';
@@ -10,14 +10,21 @@ import { ItemDetailModal } from '@/components/ItemDetailModal';
 import { AdisyonDrawer } from '@/components/AdisyonDrawer';
 import { OrderSuccessModal } from '@/components/OrderSuccessModal';
 import { CallWaiterToast } from '@/components/CallWaiterToast';
+import { CallWaiterModal } from '@/components/CallWaiterModal';
+import { TableSelectModal } from '@/components/TableSelectModal';
 import { WifiModal } from '@/components/WifiModal';
 import { FooterBranding } from '@/components/FooterBranding';
 
 import { TABLE_INFO, CATEGORIES, MENU_ITEMS } from '@/data/menu';
 import { MenuItem, BasketItem, BadgeType } from '@/types/menu';
+import { saveOrder } from '@/lib/orderStorage';
 import { UtensilsCrossed } from 'lucide-react';
 
 export default function QRMenuPage() {
+  // Table Selection State
+  const [isTableSelectOpen, setIsTableSelectOpen] = useState<boolean>(true);
+  const [selectedTableNumber, setSelectedTableNumber] = useState<string>('');
+
   // State
   const [activeCategoryId, setActiveCategoryId] = useState<string>('popular');
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -30,8 +37,22 @@ export default function QRMenuPage() {
   const [selectedDetailItem, setSelectedDetailItem] = useState<MenuItem | null>(null);
   const [isWifiOpen, setIsWifiOpen] = useState<boolean>(false);
   const [isCallWaiterToast, setIsCallWaiterToast] = useState<boolean>(false);
+  const [isCallWaiterModalOpen, setIsCallWaiterModalOpen] = useState<boolean>(false);
+  const [callWaiterTableNumber, setCallWaiterTableNumber] = useState<string>('');
   const [isOrderSuccessModal, setIsOrderSuccessModal] = useState<boolean>(false);
   const [lastOrderNumber, setLastOrderNumber] = useState<string>('');
+
+  // Computed dynamic table info
+  const dynamicTableInfo = useMemo(() => ({
+    ...TABLE_INFO,
+    tableNumber: selectedTableNumber ? `Masa ${selectedTableNumber}` : TABLE_INFO.tableNumber,
+  }), [selectedTableNumber]);
+
+  // Handle table selection
+  const handleTableSelect = useCallback((tableNum: string) => {
+    setSelectedTableNumber(tableNum);
+    setIsTableSelectOpen(false);
+  }, []);
 
   // Filtering Logic
   const filteredItems = useMemo(() => {
@@ -154,12 +175,23 @@ export default function QRMenuPage() {
     );
   };
 
-  // Submit Order
+  // Submit Order - saves to localStorage
   const handleSubmitOrder = () => {
     const randomCode = Math.floor(1000 + Math.random() * 9000).toString();
-    setLastOrderNumber(`LZT-${randomCode}`);
+    const orderNum = `LZT-${randomCode}`;
+
+    // Save order to local storage with table number
+    saveOrder(selectedTableNumber, orderNum, basketItems);
+
+    setLastOrderNumber(orderNum);
     setIsOrderSuccessModal(true);
     setBasketItems([]);
+  };
+
+  // Handle Call Waiter with table number
+  const handleCallWaiter = (tableNum: string) => {
+    setCallWaiterTableNumber(tableNum);
+    setIsCallWaiterToast(true);
   };
 
   // Get current category label for title
@@ -167,10 +199,16 @@ export default function QRMenuPage() {
 
   return (
     <MobileFrame>
+      {/* 0. Table Selection Modal (appears first) */}
+      <TableSelectModal
+        isOpen={isTableSelectOpen}
+        onSelectTable={handleTableSelect}
+      />
+
       {/* 1. Restaurant Full Header */}
       <MenuHeader
-        tableInfo={TABLE_INFO}
-        onCallWaiter={() => setIsCallWaiterToast(true)}
+        tableInfo={dynamicTableInfo}
+        onCallWaiter={() => setIsCallWaiterModalOpen(true)}
         onOpenWifi={() => setIsWifiOpen(true)}
       />
 
@@ -267,7 +305,7 @@ export default function QRMenuPage() {
       {/* 7. Adisyon Summary & Drawer */}
       <AdisyonDrawer
         basketItems={basketItems}
-        tableInfo={TABLE_INFO}
+        tableInfo={dynamicTableInfo}
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={(id) => handleUpdateQuantity(id, -100)}
         onClearBasket={() => setBasketItems([])}
@@ -279,21 +317,29 @@ export default function QRMenuPage() {
         isOpen={isOrderSuccessModal}
         onClose={() => setIsOrderSuccessModal(false)}
         orderNumber={lastOrderNumber}
-        tableNumber={TABLE_INFO.tableNumber}
+        tableNumber={dynamicTableInfo.tableNumber}
       />
 
-      {/* 9. Call Waiter Toast */}
+      {/* 9. Call Waiter Modal (with table number input) */}
+      <CallWaiterModal
+        isOpen={isCallWaiterModalOpen}
+        onClose={() => setIsCallWaiterModalOpen(false)}
+        currentTableNumber={selectedTableNumber}
+        onCallWaiter={handleCallWaiter}
+      />
+
+      {/* 10. Call Waiter Toast (confirmation) */}
       <CallWaiterToast
         isVisible={isCallWaiterToast}
         onClose={() => setIsCallWaiterToast(false)}
-        tableNumber={TABLE_INFO.tableNumber}
+        tableNumber={callWaiterTableNumber ? `Masa ${callWaiterTableNumber}` : dynamicTableInfo.tableNumber}
       />
 
-      {/* 10. Wi-Fi Modal */}
+      {/* 11. Wi-Fi Modal */}
       <WifiModal
         isOpen={isWifiOpen}
         onClose={() => setIsWifiOpen(false)}
-        tableInfo={TABLE_INFO}
+        tableInfo={dynamicTableInfo}
       />
     </MobileFrame>
   );
