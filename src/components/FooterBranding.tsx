@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Sparkles, ShieldCheck, RefreshCw } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 
 export const FooterBranding: React.FC = () => {
   return (
@@ -20,6 +20,19 @@ export const FooterBranding: React.FC = () => {
           <span>•</span>
           <span>Tüm Hakları Saklıdır</span>
         </div>
+
+        <p className="text-[10px] text-stone-400">
+          Bu sistem{' '}
+          <a
+            href="https://visiondevstudio.com.tr/"
+            target="_blank"
+            rel="noreferrer"
+            className="transition-opacity hover:opacity-100 hover:underline focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 rounded-sm"
+          >
+            VisionDevStudio
+          </a>{' '}
+          tarafından tasarlanmıştır.
+        </p>
       </div>
     </footer>
   );
