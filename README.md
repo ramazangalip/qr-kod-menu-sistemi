@@ -1,36 +1,106 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# QR Kod Menü Sistemi
 
-## Getting Started
+**Lezzet Durağı** için geliştirilmiş, mobil öncelikli dijital menü ve sipariş takip arayüzü. Müşteriler QR koddan menüyü inceleyip sipariş oluşturabilir; işletme tarafı ise siparişleri `/panel` ekranından görüntüleyip durumlarını güncelleyebilir.
 
-First, run the development server:
+## Öne çıkanlar
+
+- Masa seçimiyle başlayan mobil uyumlu menü deneyimi
+- Kategori, metin araması ve rozet bazlı filtreleme
+- Ürün detayları: açıklama, puan, hazırlama süresi, alerjenler ve ürün seçenekleri
+- Sepete ürün ekleme, adet değiştirme, özel not ve tutar hesaplama
+- Sipariş numarası oluşturma ve sipariş onayı
+- Wi-Fi bilgilerini görüntüleme ve parolayı panoya kopyalama
+- Garson çağırma bildirimi
+- Sipariş yönetim panelinde arama, durum filtresi, özet istatistikleri ve sipariş durum güncelleme
+
+## Ekran fotoğrafları
+
+| Masa seçimi | Ana menü |
+| --- | --- |
+| ![Masa seçim ekranı](public/screenshots/masa-secimi.png) | ![Ana menü ekranı](public/screenshots/ana-menu.png) |
+
+| Garson çağırma | Wi-Fi bilgileri |
+| --- | --- |
+| ![Garson çağırma penceresi](public/screenshots/garson-cagir.png) | ![Wi-Fi bilgileri penceresi](public/screenshots/wifi-bilgileri.png) |
+
+| Adisyon özeti | Sipariş onayı |
+| --- | --- |
+| ![Adisyon özeti](public/screenshots/adisyon-ozeti.png) | ![Sipariş onay ekranı](public/screenshots/siparis-onayi.png) |
+
+![Sipariş yönetim paneli](public/screenshots/siparis-paneli.png)
+
+## Teknolojiler
+
+- [Next.js 16](https://nextjs.org/)
+- React 19 ve TypeScript
+- Tailwind CSS 4
+- Framer Motion
+- Lucide React ikonları
+
+## Başlangıç
+
+### Gereksinimler
+
+- Node.js 20 veya daha güncel bir LTS sürümü
+- npm
+
+### Kurulum
+
+```bash
+git clone <depo-adresi>
+cd qr-kod-menu-sistemi
+npm install
+```
+
+### Geliştirme sunucusu
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Tarayıcıda [http://localhost:3000](http://localhost:3000) adresini açın.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Sayfa | Amaç |
+| --- | --- |
+| `/` | Müşteri menüsü ve sipariş oluşturma |
+| `/panel` | Siparişleri izleme ve yönetme |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Komutlar
 
-## Learn More
+```bash
+npm run dev    # Geliştirme sunucusunu başlatır
+npm run lint   # ESLint denetimini çalıştırır
+npm run build  # Üretim derlemesi oluşturur
+npm run start  # Üretim sunucusunu başlatır
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Yapılandırma
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Örnek restoran, masa, Wi-Fi, kategori ve ürün verileri [`src/data/menu.ts`](src/data/menu.ts) içinde bulunur. Kendi işletmenize uyarlamak için bu dosyadaki aşağıdaki yapıları düzenleyin:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `TABLE_INFO`: restoran adı, varsayılan masa, bölüm ve Wi-Fi bilgileri
+- `CATEGORIES`: menü kategorileri
+- `MENU_ITEMS`: ürün, fiyat, görsel, rozet, alerjen ve seçenek bilgileri
 
-## Deploy on Vercel
+## Sipariş verisi hakkında
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Siparişler sunucuya gönderilmez; tarayıcının `localStorage` alanında `lezzet-duragi-orders` anahtarıyla saklanır. Bu nedenle müşteri menüsü ile yönetim paneli **aynı tarayıcı ve aynı origin** üzerinde açıldığında aynı kayıtları görür.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Bu yaklaşım arayüz demosu için uygundur; gerçek bir QR menü kurulumu için siparişlerin farklı cihazlar arasında paylaşılabilmesi adına bir API, veritabanı ve kimlik doğrulama katmanı eklenmelidir.
+
+## Proje yapısı
+
+```text
+src/
+├── app/
+│   ├── page.tsx          # Müşteri menüsü
+│   └── panel/page.tsx    # Sipariş yönetim paneli
+├── components/           # Menü kartları, modal pencereler ve sepet arayüzü
+├── data/menu.ts          # Örnek restoran ve menü verileri
+├── lib/orderStorage.ts   # Tarayıcı yerel depolama işlemleri
+└── types/menu.ts         # TypeScript veri tipleri
+```
+
+## Lisans
+
+Bu proje özel kullanım amacıyla hazırlanmıştır. Lisans koşulları belirlenmeden yeniden dağıtılmamalıdır.
