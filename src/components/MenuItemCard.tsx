@@ -44,6 +44,11 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({
 
           {/* Badges on image */}
           <div className="absolute top-2.5 left-2.5 flex flex-wrap gap-1 z-10 max-w-[80%]">
+            {item.isAvailable === false && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold border backdrop-blur-md shadow-xs bg-rose-50 text-rose-800 border-rose-200">
+                Tükendi
+              </span>
+            )}
             {item.badges?.slice(0, 2).map((badge) => {
               const style = BADGE_STYLES[badge] || { bg: 'bg-stone-100 text-stone-800 border-stone-200', icon: Sparkles };
               const Icon = style.icon;
@@ -97,7 +102,11 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({
         </div>
 
         {/* Add / Quantity Counter */}
-        {quantityInBasket > 0 ? (
+        {item.isAvailable === false ? (
+          <span className="inline-flex items-center px-3 py-1.5 rounded-xl bg-stone-100 text-stone-400 text-xs font-bold border border-stone-200 cursor-not-allowed">
+            Tükendi
+          </span>
+        ) : quantityInBasket > 0 ? (
           <div className="flex items-center gap-2 bg-stone-100 p-1 rounded-xl border border-stone-200 shadow-xs">
             <button
               onClick={(e) => {

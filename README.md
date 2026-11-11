@@ -1,17 +1,26 @@
 # QR Kod Menü Sistemi
 
-**Lezzet Durağı** için geliştirilmiş, mobil öncelikli dijital menü ve sipariş takip arayüzü. Müşteriler QR koddan menüyü inceleyip sipariş oluşturabilir; işletme tarafı ise siparişleri `/panel` ekranından görüntüleyip durumlarını güncelleyebilir.
+**Lezzet Durağı** için geliştirilmiş, mobil öncelikli dijital menü, sipariş takip ve menü yönetim arayüzü. Müşteriler QR kod ile masalarını seçip menüyü inceleyebilir, sepet oluşturup sipariş verebilir ve garson çağırabilir. İşletme tarafı ise `/panel` ekranından gelen siparişleri takip edebilir ve **menüdeki tüm ürün bilgilerini (fiyat, açıklama, stok/tükendi durumu, görsel, rozetler, alerjenler vb.) anlık olarak güncelleyebilir.**
 
 ## Öne çıkanlar
 
-- Masa seçimiyle başlayan mobil uyumlu menü deneyimi
-- Kategori, metin araması ve rozet bazlı filtreleme
-- Ürün detayları: açıklama, puan, hazırlama süresi, alerjenler ve ürün seçenekleri
-- Sepete ürün ekleme, adet değiştirme, özel not ve tutar hesaplama
-- Sipariş numarası oluşturma ve sipariş onayı
-- Wi-Fi bilgilerini görüntüleme ve parolayı panoya kopyalama
-- Garson çağırma bildirimi
-- Sipariş yönetim panelinde arama, durum filtresi, özet istatistikleri ve sipariş durum güncelleme
+- **Dinamik Masa Seçimi**: 20 masalık hızlı seçim tablosu veya özel masa adı/numarası girilerek açılan menü deneyimi.
+- **Masa Numaralı Garson Çağırma**: Masaya özel servis personeli çağırma modalı ve geri sayımlı bilgilendirme bildirimi.
+- **Kategori, Arama ve Rozet Filtreleri**: Gerçek zamanlı arama, yatay kategori çubuğu ve gurme rozet (Şefin Önerisi, Popüler, Organik, Glutensiz vb.) filtreleri.
+- **Zengin Ürün Detayları**: Kalori, hazırlama süresi, alerjen uyarıları, opsiyonel pişme/içecek seçenekleri ve şefe özel sipariş notu.
+- **Adisyon & Sepet Yönetimi**: Masa adisyon toplamı, adet artırma/azaltma, anlık tutar hesaplama ve sipariş iletme.
+- **Sipariş Takip Paneli (`/panel`)**:
+  - Gelen siparişleri masa numarası, sipariş kodu ve zaman damgasıyla listeleme.
+  - Sipariş durumunu anlık olarak güncelleme (*Hazırlanıyor*, *Hazır*, *Teslim Edildi*).
+  - Sipariş arama, durum filtreleme ve toplam ciro / aktif sipariş istatistikleri.
+  - 5 saniyede bir otomatik veri yenileme.
+- **Ürün & Menü Yönetimi Paneli (`/panel` - Ürün & Menü Sekmesi)**:
+  - **Ürün Bilgilerini Güncelleme**: Ürün adı, fiyatı (₺), kategorisi, açıklaması, görsel bağlantısı, hazırlama süresi, kalori, puan ve seçenek gruplarını düzenleme.
+  - **Tek Tıkla Stok / Satış Durumu**: Ürünü tek tıkla *Satışta* veya *Tükendi* yapabilme. Tükendi işaretlenen ürünler müşteri menüsünde otomatik olarak "Tükendi" etiketiyle listelenir ve sepete eklenmesi engellenir.
+  - **Popülerlik / Öne Çıkarma**: Ürünleri tek tıkla popüler listeye ekleme ve çıkarma.
+  - **Yeni Ürün Ekleme & Silme**: Menüye yeni ürün ekleyebilme veya menüden ürün çıkarabilme.
+  - **Varsayılana Sıfırlama**: İstenildiğinde menüyü orijinal başlangıç lezzetlerine geri döndürebilme.
+- **Wi-Fi Bilgilendirme**: Şifreyi tek dokunuşla panoya kopyalama modalı.
 
 ## Ekran fotoğrafları
 
@@ -31,11 +40,12 @@
 
 ## Teknolojiler
 
-- [Next.js 16](https://nextjs.org/)
+- [Next.js 16](https://nextjs.org/) (App Router & Turbopack)
 - React 19 ve TypeScript
 - Tailwind CSS 4
 - Framer Motion
 - Lucide React ikonları
+- Canvas Confetti
 
 ## Başlangıç
 
@@ -62,8 +72,8 @@ Tarayıcıda [http://localhost:3000](http://localhost:3000) adresini açın.
 
 | Sayfa | Amaç |
 | --- | --- |
-| `/` | Müşteri menüsü ve sipariş oluşturma |
-| `/panel` | Siparişleri izleme ve yönetme |
+| `/` | Müşteri QR menüsü, masa seçimi ve sipariş verme |
+| `/panel` | Sipariş izleme, durum güncelleme ve ürün/menü yönetimi |
 
 ## Komutlar
 
@@ -74,33 +84,57 @@ npm run build  # Üretim derlemesi oluşturur
 npm run start  # Üretim sunucusunu başlatır
 ```
 
-## Yapılandırma
+## Panel Üzerinden Ürün Yönetimi
 
-Örnek restoran, masa, Wi-Fi, kategori ve ürün verileri [`src/data/menu.ts`](src/data/menu.ts) içinde bulunur. Kendi işletmenize uyarlamak için bu dosyadaki aşağıdaki yapıları düzenleyin:
+Yönetim paneline (`/panel`) gidip üst kısımdaki **"Ürün & Menü"** sekmesine geçerek:
 
-- `TABLE_INFO`: restoran adı, varsayılan masa, bölüm ve Wi-Fi bilgileri
-- `CATEGORIES`: menü kategorileri
-- `MENU_ITEMS`: ürün, fiyat, görsel, rozet, alerjen ve seçenek bilgileri
+1. **Fiyat, İçerik ve Görsel Düzenleme**: Herhangi bir ürün kartındaki **"Düzenle"** butonuna basarak ürünün adını, fiyatını, açıklamasını, görselini, hazırlama süresini, kalori miktarını, rozetlerini ve alerjenlerini güncelleyebilirsiniz.
+   - **Cihazdan Görsel Yükleme**: Bilgisayar veya mobil cihazınızdan fotoğraf seçebilir ya da sürükleyip bırakabilirsiniz. Yüklenen fotoğraflar tarayıcı belleğini şişirmemesi için otomatik olarak optimize edilip sıkıştırılarak saklanır.
+   - **Web URL ile Görsel Tanımlama**: İstenirse doğrudan internet üzerindeki bir görsel bağlantısı da girilebilir.
+2. **Anlık Stok / Tükendi Durumu**: Ürün kartının sağ üstündeki **"Satışta / Tükendi"** butonuna basarak ürünü hemen tükendi olarak işaretleyebilirsiniz. Değişiklik kaydedildiği anda müşteri arayüzünde buton devre dışı kalır ve "Tükendi" rozeti gösterilir.
+3. **Yeni Ürün Ekleme**: **"+ Yeni Ürün Ekle"** butonunu kullanarak menünüze yeni gurme lezzetler tanımlayabilirsiniz.
+4. **Varsayılan Menüye Sıfırlama**: İhtiyaç duyduğunuzda **"Varsayılana Sıfırla"** butonu ile menüyü orijinal `src/data/menu.ts` içeriğine geri döndürebilirsiniz.
 
-## Sipariş verisi hakkında
+## Veri Depolama (LocalDB / localStorage)
 
-Siparişler sunucuya gönderilmez; tarayıcının `localStorage` alanında `lezzet-duragi-orders` anahtarıyla saklanır. Bu nedenle müşteri menüsü ile yönetim paneli **aynı tarayıcı ve aynı origin** üzerinde açıldığında aynı kayıtları görür.
+Uygulama istemci taraflı LocalDB mekanizması olarak tarayıcının `localStorage` alanını kullanır:
 
-Bu yaklaşım arayüz demosu için uygundur; gerçek bir QR menü kurulumu için siparişlerin farklı cihazlar arasında paylaşılabilmesi adına bir API, veritabanı ve kimlik doğrulama katmanı eklenmelidir.
+- **Siparişler**: `lezzet-duragi-orders` anahtarıyla kaydedilir. Verilen siparişler masa numarası, ürünler, toplam tutar ve zaman damgasıyla saklanır.
+- **Ürünler & Menü**: `lezzet-duragi-menu-items` anahtarıyla saklanır. Panelden yapılan fiyat, açıklama ve stok güncellemeleri anlık olarak müşteri arayüzüne senkronize edilir.
+
+> **Not**: Müşteri menüsü (`/`) ile yönetim paneli (`/panel`) aynı tarayıcıda çalıştırıldığında tüm siparişler ve menü güncellemeleri eşzamanlı olarak birbirine yansır. Üretim ortamında birden fazla bağımsız cihaz arasında veri paylaşımı için bir veritabanı (PostgreSQL, Supabase vb.) ve API katmanı bağlanabilir.
 
 ## Proje yapısı
 
 ```text
 src/
 ├── app/
-│   ├── page.tsx          # Müşteri menüsü
-│   └── panel/page.tsx    # Sipariş yönetim paneli
-├── components/           # Menü kartları, modal pencereler ve sepet arayüzü
-├── data/menu.ts          # Örnek restoran ve menü verileri
-├── lib/orderStorage.ts   # Tarayıcı yerel depolama işlemleri
-└── types/menu.ts         # TypeScript veri tipleri
+│   ├── page.tsx                           # Müşteri QR menü sayfası
+│   └── panel/page.tsx                     # Sipariş & Ürün yönetim paneli
+├── components/
+│   ├── panel/
+│   │   └── ProductEditModal.tsx          # Ürün düzenleme ve ekleme modalı
+│   ├── AdisyonDrawer.tsx                  # Sepet ve adisyon özeti
+│   ├── CallWaiterModal.tsx                # Masa numaralı garson çağırma modalı
+│   ├── CallWaiterToast.tsx                # Garson çağrıldı bildirimi
+│   ├── CategoryNav.tsx                    # Kategori gezinme çubuğu
+│   ├── ItemDetailModal.tsx                # Ürün detay modalı
+│   ├── MenuHeader.tsx                     # Restoran başlığı ve kapak görseli
+│   ├── MenuItemCard.tsx                   # Menü ürün kartı
+│   ├── MobileFrame.tsx                    # Mobil ve masaüstü duyarlı taşıyıcı
+│   ├── OrderSuccessModal.tsx              # Sipariş tamamlandı modalı
+│   ├── SearchBar.tsx                      # Arama ve filtreleme çubuğu
+│   ├── TableSelectModal.tsx               # Masa seçim modalı
+│   └── WifiModal.tsx                      # Wi-Fi bağlantı modalı
+├── data/
+│   └── menu.ts                            # Varsayılan restoran ve menü verileri
+├── lib/
+│   ├── menuStorage.ts                     # Menü ürünleri LocalDB yönetimi
+│   └── orderStorage.ts                    # Masa siparişleri LocalDB yönetimi
+└── types/
+    └── menu.ts                            # TypeScript arayüz ve veri tipleri
 ```
 
 ## Lisans
 
-Bu proje özel kullanım amacıyla hazırlanmıştır. Lisans koşulları belirlenmeden yeniden dağıtılmamalıdır.
+Bu proje özel kullanım amacıyla hazırlanmıştır.

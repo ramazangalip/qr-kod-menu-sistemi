@@ -216,26 +216,35 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
             </div>
 
             {/* Add to Basket Button */}
-            <button
-              onClick={handleAdd}
-              disabled={isAddedToast}
-              className="flex-1 flex items-center justify-between px-5 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-bold text-sm shadow-md transition-all duration-200"
-            >
-              <span className="flex items-center gap-2">
-                {isAddedToast ? (
-                  <>
-                    <Check className="w-4 h-4 text-white animate-bounce" />
-                    <span>Eklendi!</span>
-                  </>
-                ) : (
-                  <>
-                    <ShoppingBag className="w-4 h-4" />
-                    <span>Adisyona Ekle</span>
-                  </>
-                )}
-              </span>
-              <span className="text-base font-extrabold">₺{totalPrice.toLocaleString('tr-TR')}</span>
-            </button>
+            {item.isAvailable === false ? (
+              <button
+                disabled
+                className="flex-1 flex items-center justify-center px-5 py-3.5 rounded-xl bg-stone-200 text-stone-500 font-bold text-sm cursor-not-allowed"
+              >
+                <span>Bu Ürün Geçici Olarak Tükendi</span>
+              </button>
+            ) : (
+              <button
+                onClick={handleAdd}
+                disabled={isAddedToast}
+                className="flex-1 flex items-center justify-between px-5 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-bold text-sm shadow-md transition-all duration-200"
+              >
+                <span className="flex items-center gap-2">
+                  {isAddedToast ? (
+                    <>
+                      <Check className="w-4 h-4 text-white animate-bounce" />
+                      <span>Eklendi!</span>
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingBag className="w-4 h-4" />
+                      <span>Adisyona Ekle</span>
+                    </>
+                  )}
+                </span>
+                <span className="text-base font-extrabold">₺{totalPrice.toLocaleString('tr-TR')}</span>
+              </button>
+            )}
           </div>
         </motion.div>
       </div>

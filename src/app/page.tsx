@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { MobileFrame } from '@/components/MobileFrame';
 import { MenuHeader } from '@/components/MenuHeader';
 import { CategoryNav } from '@/components/CategoryNav';
@@ -18,9 +18,29 @@ import { FooterBranding } from '@/components/FooterBranding';
 import { TABLE_INFO, CATEGORIES, MENU_ITEMS } from '@/data/menu';
 import { MenuItem, BasketItem, BadgeType } from '@/types/menu';
 import { saveOrder } from '@/lib/orderStorage';
+import { getMenuItems } from '@/lib/menuStorage';
 import { UtensilsCrossed } from 'lucide-react';
 
 export default function QRMenuPage() {
+  // Menu items state synced with local storage
+  const [menuItems, setMenuItems] = useState<MenuItem[]>(MENU_ITEMS);
+
+  useEffect(() => {
+    setMenuItems(getMenuItems());
+
+    const handleUpdate = () => {
+      setMenuItems(getMenuItems());
+    };
+
+    window.addEventListener('menu-items-updated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
+
+    return () => {
+      window.removeEventListener('menu-items-updated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+    };
+  }, []);
+
   // Table Selection State
   const [isTableSelectOpen, setIsTableSelectOpen] = useState<boolean>(true);
   const [selectedTableNumber, setSelectedTableNumber] = useState<string>('');
@@ -56,7 +76,7 @@ export default function QRMenuPage() {
 
   // Filtering Logic
   const filteredItems = useMemo(() => {
-    return MENU_ITEMS.filter((item) => {
+    return menuItems.filter((item) => {
       // 1. Search term match
       if (searchTerm.trim() !== '') {
         const query = searchTerm.toLowerCase();
@@ -80,7 +100,7 @@ export default function QRMenuPage() {
 
       return true;
     });
-  }, [searchTerm, selectedBadge, activeCategoryId]);
+  }, [menuItems, searchTerm, selectedBadge, activeCategoryId]);
 
   // Quick Add Item
   const handleQuickAdd = (item: MenuItem) => {
